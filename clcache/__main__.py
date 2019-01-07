@@ -27,6 +27,7 @@ import threading
 from tempfile import TemporaryFile
 from typing import Any, List, Tuple, Iterator
 from atomicwrites import atomic_write
+import configparser
 
 VERSION = "4.2.0-dev"
 
@@ -1014,6 +1015,24 @@ def findCompilerBinary():
             path = which(path)
 
         return path if os.path.exists(path) else None
+    #
+    # Check whether there is CLCACHE_CL.ini file in the current clcache dir
+    # if yes, use the cl_path option value in CLCACHE_CL.ini as compiler path
+    #
+    cl_path_cfgfile = os.path.join(os.path.dirname(sys.argv[0]), "CLCACHE_CL.ini")
+    print("cl_path_cfgfile=" + cl_path_cfgfile)
+    if os.path.exists(cl_path_cfgfile):
+        config = configparser.ConfigParser()
+        config.read(cl_path_cfgfile)
+        if config.has_option('CL_PATH', 'cl_path'):
+            cl_path = config.get('CL_PATH', 'cl_path')
+            if os.path.exists(cl_path):
+                print(cl_path)
+                return cl_path
+            else :
+                print('WARNING: the CL path in ' + cl_path + ' is not correct, please check it.')
+        else :
+            print('WARNING: there is no cl_path section or option in ' + cl_path_cfgfile + ' please check it.')
 
     frozenByPy2Exe = hasattr(sys, "frozen")
 
