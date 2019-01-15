@@ -29,7 +29,7 @@ from typing import Any, List, Tuple, Iterator
 from atomicwrites import atomic_write
 import configparser
 
-VERSION = "4.2.0-dev"
+VERSION = "4.2.0-dev-edk2-20190115"
 
 HashAlgorithm = hashlib.md5
 
@@ -674,7 +674,7 @@ class PersistentJSONDict:
 
 
 class Configuration:
-    _defaultValues = {"MaximumCacheSize": 1073741824} # 1 GiB
+    _defaultValues = {"MaximumCacheSize": 5368709120} # 5 GiB
 
     def __init__(self, configurationFile):
         self._configurationFile = configurationFile
@@ -1020,19 +1020,19 @@ def findCompilerBinary():
     # if yes, use the cl_path option value in CLCACHE_CL.ini as compiler path
     #
     cl_path_cfgfile = os.path.join(os.path.dirname(sys.argv[0]), "CLCACHE_CL.ini")
-    print("cl_path_cfgfile=" + cl_path_cfgfile)
+    printTraceStatement("cl_path_cfgfile=" + cl_path_cfgfile)
     if os.path.exists(cl_path_cfgfile):
         config = configparser.ConfigParser()
         config.read(cl_path_cfgfile)
         if config.has_option('CL_PATH', 'cl_path'):
             cl_path = config.get('CL_PATH', 'cl_path')
             if os.path.exists(cl_path):
-                print(cl_path)
+                printTraceStatement(cl_path)
                 return cl_path
             else :
-                print('WARNING: the CL path in ' + cl_path + ' is not correct, please check it.')
+                printTraceStatement('WARNING: the CL path in ' + cl_path + ' is not correct, please check it.')
         else :
-            print('WARNING: there is no cl_path section or option in ' + cl_path_cfgfile + ' please check it.')
+            printTraceStatement('WARNING: there is no cl_path section or option in ' + cl_path_cfgfile + ' please check it.')
 
     frozenByPy2Exe = hasattr(sys, "frozen")
 
@@ -1320,8 +1320,8 @@ class CommandLineAnalyzer:
 
         # Technically, it would be possible to support /Zi: we'd just need to
         # copy the generated .pdb files into/out of the cache.
-        if 'Zi' in options:
-            raise ExternalDebugInfoError()
+        #if 'Zi' in options:
+        #    raise ExternalDebugInfoError()
 
         if 'Yc' in options or 'Yu' in options:
             raise CalledWithPchError()
