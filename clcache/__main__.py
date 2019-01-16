@@ -29,7 +29,7 @@ from typing import Any, List, Tuple, Iterator
 from atomicwrites import atomic_write
 import configparser
 
-VERSION = "4.2.0-dev-edk2-20190115"
+VERSION = "4.2.0-dev-edk2-20190116"
 
 HashAlgorithm = hashlib.md5
 
