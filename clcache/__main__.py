@@ -1321,7 +1321,7 @@ class CommandLineAnalyzer:
         # Technically, it would be possible to support /Zi: we'd just need to
         # copy the generated .pdb files into/out of the cache.
         if 'Zi' in options:
-           raise ExternalDebugInfoError()
+            raise ExternalDebugInfoError()
 
         if 'Yc' in options or 'Yu' in options:
             raise CalledWithPchError()
