@@ -30,7 +30,7 @@ from typing import Any, List, Tuple, Iterator
 from atomicwrites import atomic_write
 import configparser
 
-VERSION = "4.2.0-dev-edk2-20190116"
+VERSION = "4.2.0-dev-edk2-20190314"
 
 HashAlgorithm = hashlib.md5
 
@@ -355,7 +355,7 @@ class CacheLock:
 
     @staticmethod
     def forPath(path):
-        timeoutMs = int(os.environ.get('CLCACHE_OBJECT_CACHE_TIMEOUT_MS', 10 * 1000))
+        timeoutMs = int(os.environ.get('CLCACHE_OBJECT_CACHE_TIMEOUT_MS', 120 * 1000))
         lockName = path.replace(':', '-').replace('\\', '-')
         return CacheLock(lockName, timeoutMs)
 
@@ -506,7 +506,7 @@ class CacheFileStrategy:
             try:
                 self.dir = os.environ["CLCACHE_DIR"]
             except KeyError:
-                self.dir = os.path.join(os.path.expanduser("~"), "clcache")
+                self.dir = os.path.join(os.path.expandvars("%LOCALAPPDATA%"), "clcache")
 
         manifestsRootDir = os.path.join(self.dir, "manifests")
         ensureDirectoryExists(manifestsRootDir)
