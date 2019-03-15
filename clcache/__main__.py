@@ -30,7 +30,7 @@ from typing import Any, List, Tuple, Iterator
 from atomicwrites import atomic_write
 import configparser
 
-VERSION = "4.2.0-dev-edk2-20190315-v3"
+VERSION = "4.2.0-dev-edk2-20190315-v4"
 
 HashAlgorithm = hashlib.md5
 
@@ -657,8 +657,32 @@ class PersistentJSONDict:
 
     def save(self):
         if self._dirty:
-            with atomic_write(self._fileName, overwrite=True) as f:
-                json.dump(self._dict, f, sort_keys=True, indent=4)
+            #
+            # It is not unusual that we observed the atomic_write() has data race
+            # in multipul threads and can raise exception to stop build as below:
+            # PermissionError: [WinError 5] Access is denied.
+            # Even the %LOCALAPPDATA% suggestion in below links still cannot
+            # totally fix the exceptions in our CI build system
+            # https://github.com/frerich/clcache/pull/334#issuecomment-452475038
+            # https://github.com/frerich/clcache/issues/342
+            #
+            # So, simply retry the atomic_write() several times first and then just
+            # pass through if still fails. The save() work around looks only impact
+            # the statistics data accurate. Since The build expection hang is always
+            # show stopper issue for us with top priority, it's OK for us get harden
+            # stable compiler cache with cost of inaccurate statistics info.
+            # https://stackoverflow.com/questions/2083987/how-to-retry-after-exception
+            #
+            for attempt in range(3):
+                try:
+                    with atomic_write(self._fileName, overwrite=True) as f:
+                        json.dump(self._dict, f, sort_keys=True, indent=4)
+                except:
+                    printErrStr("clcache: atomic_write %s fail with exception" % self._fileName)
+                else:
+                    break
+            else:
+                pass
 
     def __setitem__(self, key, value):
         self._dict[key] = value
@@ -675,7 +699,7 @@ class PersistentJSONDict:
 
 
 class Configuration:
-    _defaultValues = {"MaximumCacheSize": 5368709120} # 5 GiB
+    _defaultValues = {"MaximumCacheSize": 10*1204*1024*1024} # 10 GiB
 
     def __init__(self, configurationFile):
         self._configurationFile = configurationFile
