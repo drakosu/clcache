@@ -30,7 +30,7 @@ from typing import Any, List, Tuple, Iterator
 from atomicwrites import atomic_write
 import configparser
 
-VERSION = "4.2.0-dev-edk2-20190314"
+VERSION = "4.2.0-dev-edk2-20190315-v3"
 
 HashAlgorithm = hashlib.md5
 
@@ -1019,8 +1019,9 @@ def findCompilerBinary():
     #
     # Check whether there is CLCACHE_CL.ini file in the current clcache dir
     # if yes, use the cl_path option value in CLCACHE_CL.ini as compiler path
-    #
-    cl_path_cfgfile = os.path.join(os.path.dirname(sys.argv[0]), "CLCACHE_CL.ini")
+    # https://www.blog.pythonlibrary.org/2013/10/29/python-101-how-to-find-the-path-of-a-running-script/
+    # https://stackoverflow.com/questions/50499/how-do-i-get-the-path-and-name-of-the-file-that-is-currently-executing
+    cl_path_cfgfile = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "CLCACHE_CL.ini")
     printTraceStatement("cl_path_cfgfile=" + cl_path_cfgfile)
     if os.path.exists(cl_path_cfgfile):
         config = configparser.ConfigParser()
@@ -1605,9 +1606,9 @@ def main():
         return 0
 
     if options.clean_cache:
-        cleanCache(cache)
-        print('Cache cleaned')
-        return 0
+        #cleanCache(cache)
+        print('see -c as /c, because edk2 BaseTools build usage: cl.exe -c ...')
+        #return 0
 
     if options.clear_cache:
         clearCache(cache)
