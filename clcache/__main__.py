@@ -1594,20 +1594,20 @@ def main():
                 values.insert(0, nonCommand)
             setattr(namespace, self.dest, values)
 
-    parser = argparse.ArgumentParser(description="clcache.py v" + VERSION)
+    parser = argparse.ArgumentParser(description="clcache.py v" + VERSION,prefix_chars='+')
     # Handle the clcache standalone actions, only one can be used at a time
     groupParser = parser.add_mutually_exclusive_group()
-    groupParser.add_argument("-s", "--stats", dest="show_stats",
+    groupParser.add_argument("+s", "++stats", dest="show_stats",
                              action="store_true",
                              help="print cache statistics")
-    groupParser.add_argument("-c", "--clean", dest="clean_cache",
+    groupParser.add_argument("+c", "++clean", dest="clean_cache",
                              action="store_true", help="clean cache")
-    groupParser.add_argument("-C", "--clear", dest="clear_cache",
+    groupParser.add_argument("+C", "++clear", dest="clear_cache",
                              action="store_true", help="clear cache")
-    groupParser.add_argument("-z", "--reset", dest="reset_stats",
+    groupParser.add_argument("+z", "++reset", dest="reset_stats",
                              action="store_true",
                              help="reset cache statistics")
-    groupParser.add_argument("-M", "--set-size", dest="cache_size", type=int,
+    groupParser.add_argument("+M", "++set-size", dest="cache_size", type=int,
                              default=None,
                              help="set maximum cache size (in bytes)")
 
